@@ -1,0 +1,302 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.22621}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang9 <!DOCTYPE html>\par
+<html lang="en">\par
+<head>\par
+  <meta charset="UTF-8" />\par
+  <meta name="viewport" content="width=device-width, initial-scale=1" />\par
+  <title>Promosphere</title>\par
+  <style>\par
+    body \{\par
+      font-family: Arial, sans-serif;\par
+      background: #121212;\par
+      color: #eee;\par
+      margin: 0; padding: 0;\par
+    \}\par
+    header \{\par
+      background: #0d47a1;\par
+      padding: 1.5rem;\par
+      text-align: center;\par
+      font-size: 2rem;\par
+      font-weight: bold;\par
+      letter-spacing: 2px;\par
+      color: #fff;\par
+    \}\par
+    main \{\par
+      max-width: 900px;\par
+      margin: 2rem auto;\par
+      background: #1e1e1e;\par
+      padding: 1.5rem;\par
+      border-radius: 8px;\par
+      box-shadow: 0 0 15px #0d47a1;\par
+    \}\par
+    form \{\par
+      margin-bottom: 2rem;\par
+      background: #222;\par
+      padding: 1rem;\par
+      border-radius: 6px;\par
+    \}\par
+    form > div \{\par
+      margin-bottom: 1rem;\par
+    \}\par
+    label \{\par
+      display: block;\par
+      margin-bottom: 0.3rem;\par
+      font-weight: bold;\par
+    \}\par
+    input[type="text"], textarea, select \{\par
+      width: 100%;\par
+      padding: 0.5rem;\par
+      border: none;\par
+      border-radius: 4px;\par
+      background: #333;\par
+      color: #eee;\par
+      font-size: 1rem;\par
+      resize: vertical;\par
+    \}\par
+    button \{\par
+      background: #0d47a1;\par
+      color: white;\par
+      border: none;\par
+      padding: 0.7rem 1.5rem;\par
+      font-size: 1rem;\par
+      border-radius: 4px;\par
+      cursor: pointer;\par
+      transition: background 0.3s ease;\par
+    \}\par
+    button:hover \{\par
+      background: #1565c0;\par
+    \}\par
+    section.post \{\par
+      background: #222;\par
+      padding: 1rem;\par
+      margin-bottom: 1.5rem;\par
+      border-radius: 6px;\par
+      box-shadow: 0 0 5px #0d47a1;\par
+      position: relative;\par
+    \}\par
+    section.post h3 \{\par
+      margin-top: 0;\par
+      color: #90caf9;\par
+    \}\par
+    section.post p \{\par
+      white-space: pre-wrap;\par
+    \}\par
+    .media img, .media video \{\par
+      max-width: 100%;\par
+      border-radius: 5px;\par
+      margin-top: 0.8rem;\par
+    \}\par
+    .links a \{\par
+      display: block;\par
+      color: #64b5f6;\par
+      margin: 0.3rem 0;\par
+      text-decoration: none;\par
+      word-break: break-word;\par
+    \}\par
+    .links a:hover \{\par
+      text-decoration: underline;\par
+    \}\par
+    /* Delete button style */\par
+    button.delete-btn \{\par
+      position: absolute;\par
+      top: 8px;\par
+      right: 8px;\par
+      background: #b71c1c;\par
+      border: none;\par
+      color: white;\par
+      padding: 0.3rem 0.6rem;\par
+      border-radius: 4px;\par
+      cursor: pointer;\par
+      font-size: 0.9rem;\par
+      transition: background 0.3s ease;\par
+    \}\par
+    button.delete-btn:hover \{\par
+      background: #f44336;\par
+    \}\par
+  </style>\par
+</head>\par
+<body>\par
+\par
+<header>Promosphere</header>\par
+\par
+<main>\par
+  <form id="postForm">\par
+    <div>\par
+      <label for="postType">Select content type:</label>\par
+      <select id="postType" required>\par
+        <option value="" disabled selected>Choose type</option>\par
+        <option value="article">Article</option>\par
+        <option value="picture">Picture (Image URL)</option>\par
+        <option value="video">Video (MP4 URL)</option>\par
+        <option value="link">Link</option>\par
+      </select>\par
+    </div>\par
+\par
+    <div id="titleDiv">\par
+      <label for="titleInput">Title:</label>\par
+      <input type="text" id="titleInput" placeholder="Enter a title" required />\par
+    </div>\par
+\par
+    <div id="contentDiv">\par
+      <label for="contentInput">Content:</label>\par
+      <textarea id="contentInput" rows="4" placeholder="Enter article text or URL here..." required></textarea>\par
+    </div>\par
+\par
+    <button type="submit">Add Post</button>\par
+  </form>\par
+\par
+  <div id="postsContainer"></div>\par
+</main>\par
+\par
+<script>\par
+  const postForm = document.getElementById('postForm');\par
+  const postTypeSelect = document.getElementById('postType');\par
+  const titleInput = document.getElementById('titleInput');\par
+  const contentInput = document.getElementById('contentInput');\par
+  const postsContainer = document.getElementById('postsContainer');\par
+\par
+  // Load posts from localStorage on page load\par
+  window.addEventListener('load', () => \{\par
+    const savedPosts = JSON.parse(localStorage.getItem('promospherePosts') || '[]');\par
+    savedPosts.forEach(post => addPostToDOM(post, false));\par
+  \});\par
+\par
+  postTypeSelect.addEventListener('change', () => \{\par
+    const type = postTypeSelect.value;\par
+    titleInput.required = true;\par
+    contentInput.required = true;\par
+\par
+    if (type === 'article') \{\par
+      contentInput.placeholder = "Write your article text here...";\par
+      contentInput.rows = 6;\par
+    \} else if (type === 'picture') \{\par
+      contentInput.placeholder = "Paste image URL here...";\par
+      contentInput.rows = 2;\par
+    \} else if (type === 'video') \{\par
+      contentInput.placeholder = "Paste MP4 video URL here...";\par
+      contentInput.rows = 2;\par
+    \} else if (type === 'link') \{\par
+      contentInput.placeholder = "Paste the link URL here...";\par
+      contentInput.rows = 2;\par
+    \} else \{\par
+      contentInput.placeholder = "";\par
+      contentInput.rows = 4;\par
+    \}\par
+  \});\par
+\par
+  postForm.addEventListener('submit', e => \{\par
+    e.preventDefault();\par
+\par
+    const type = postTypeSelect.value;\par
+    const title = titleInput.value.trim();\par
+    const content = contentInput.value.trim();\par
+\par
+    if (!type || !title || !content) return;\par
+\par
+    const post = \{\par
+      id: Date.now(),\par
+      type,\par
+      title,\par
+      content\par
+    \};\par
+\par
+    addPostToDOM(post, true);\par
+\par
+    postForm.reset();\par
+    contentInput.placeholder = "";\par
+    contentInput.rows = 4;\par
+  \});\par
+\par
+  function addPostToDOM(post, saveToStorage = true) \{\par
+    const postElem = document.createElement('section');\par
+    postElem.className = 'post';\par
+    postElem.dataset.id = post.id;\par
+\par
+    // Title\par
+    const h3 = document.createElement('h3');\par
+    h3.textContent = post.title;\par
+    postElem.appendChild(h3);\par
+\par
+    // Content\par
+    if (post.type === 'article') \{\par
+      const p = document.createElement('p');\par
+      p.textContent = post.content;\par
+      postElem.appendChild(p);\par
+\par
+    \} else if (post.type === 'picture') \{\par
+      const div = document.createElement('div');\par
+      div.className = 'media';\par
+      const img = document.createElement('img');\par
+      img.src = post.content;\par
+      img.alt = post.title;\par
+      img.onerror = () => \{\par
+        alert('Invalid image URL');\par
+        img.remove();\par
+      \};\par
+      div.appendChild(img);\par
+      postElem.appendChild(div);\par
+\par
+    \} else if (post.type === 'video') \{\par
+      const div = document.createElement('div');\par
+      div.className = 'media';\par
+      const video = document.createElement('video');\par
+      video.controls = true;\par
+      const source = document.createElement('source');\par
+      source.src = post.content;\par
+      source.type = 'video/mp4';\par
+      video.appendChild(source);\par
+      video.onerror = () => \{\par
+        alert('Invalid video URL or format');\par
+        video.remove();\par
+      \};\par
+      div.appendChild(video);\par
+      postElem.appendChild(div);\par
+\par
+    \} else if (post.type === 'link') \{\par
+      const div = document.createElement('div');\par
+      div.className = 'links';\par
+      const a = document.createElement('a');\par
+      a.href = post.content;\par
+      a.target = '_blank';\par
+      a.rel = 'noopener noreferrer';\par
+      a.textContent = post.content;\par
+      div.appendChild(a);\par
+      postElem.appendChild(div);\par
+    \}\par
+\par
+    // Delete button\par
+    const delBtn = document.createElement('button');\par
+    delBtn.textContent = 'Delete';\par
+    delBtn.className = 'delete-btn';\par
+    delBtn.onclick = () => \{\par
+      if (confirm('Are you sure you want to delete this post?')) \{\par
+        removePost(post.id);\par
+        postElem.remove();\par
+      \}\par
+    \};\par
+    postElem.appendChild(delBtn);\par
+\par
+    // Add to DOM on top\par
+    postsContainer.prepend(postElem);\par
+\par
+    if (saveToStorage) savePost(post);\par
+  \}\par
+\par
+  function savePost(post) \{\par
+    const savedPosts = JSON.parse(localStorage.getItem('promospherePosts') || '[]');\par
+    savedPosts.unshift(post);\par
+    localStorage.setItem('promospherePosts', JSON.stringify(savedPosts));\par
+  \}\par
+\par
+  function removePost(id) \{\par
+    let savedPosts = JSON.parse(localStorage.getItem('promospherePosts') || '[]');\par
+    savedPosts = savedPosts.filter(post => post.id !== id);\par
+    localStorage.setItem('promospherePosts', JSON.stringify(savedPosts));\par
+  \}\par
+</script>\par
+\par
+</body>\par
+</html>\par
+}
+ 
